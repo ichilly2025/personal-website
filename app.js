@@ -1,71 +1,51 @@
 /**
- * Personal Website - JavaScript Application
- * 
- * This file contains all interactive logic, animation controls, and form handling
- * for the senior full-stack engineer's personal website.
- * 
+ * 个人网站 - 交互逻辑模块
+ * 包含技能图标墙自动滚动、表单处理、导航交互等功能
+ * @file app.js
  * @version 1.0.0
- * @author Senior Full-Stack Engineer
  */
 
-// DOM Content Loaded Event Listener
+// 等待DOM完全加载后执行
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Personal Website initialized');
+    console.log('个人网站初始化...');
     
-    // Initialize all modules
+    // 初始化所有模块
     initNavigation();
-    initHeroAnimations();
+    initSkillWall();
     initProjectCards();
-    initTechStackCarousel();
     initContactForm();
     initScrollAnimations();
-    initThemeManager();
-    initPerformanceOptimizations();
+    initThemeToggle();
+    
+    console.log('个人网站初始化完成');
 });
 
 /**
- * Navigation Module
- * Handles navigation menu interactions and scroll behavior
+ * 初始化导航栏交互
  */
 function initNavigation() {
     const nav = document.querySelector('nav');
     const navLinks = document.querySelectorAll('nav a[href^="#"]');
-    const mobileMenuButton = document.querySelector('.mobile-menu-button');
-    const mobileMenu = document.querySelector('.mobile-menu');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
     
     if (!nav) {
-        console.warn('Navigation element not found');
+        console.warn('导航栏元素未找到');
         return;
     }
     
-    // Handle scroll effect on navigation
-    let lastScrollTop = 0;
-    
+    // 滚动时添加/移除导航栏背景
     window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Add/remove background based on scroll position
-        if (scrollTop > 50) {
-            nav.classList.add('bg-gray-900/90', 'backdrop-blur-md', 'shadow-lg');
+        if (window.scrollY > 50) {
+            nav.classList.add('bg-slate-900/90', 'backdrop-blur-md');
             nav.classList.remove('bg-transparent');
         } else {
-            nav.classList.remove('bg-gray-900/90', 'backdrop-blur-md', 'shadow-lg');
+            nav.classList.remove('bg-slate-900/90', 'backdrop-blur-md');
             nav.classList.add('bg-transparent');
         }
-        
-        // Hide/show navigation on scroll direction
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-            // Scrolling down
-            nav.style.transform = 'translateY(-100%)';
-        } else {
-            // Scrolling up
-            nav.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollTop = scrollTop;
     });
     
-    // Smooth scrolling for navigation links
+    // 平滑滚动到锚点
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -74,253 +54,114 @@ function initNavigation() {
             if (targetId === '#') return;
             
             const targetElement = document.querySelector(targetId);
-            if (!targetElement) {
-                console.warn(`Target element ${targetId} not found`);
-                return;
+            if (targetElement) {
+                // 关闭移动端菜单（如果打开）
+                if (mobileMenu && mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+                
+                // 平滑滚动到目标元素
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
             }
-            
-            // Close mobile menu if open
-            if (mobileMenu && mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-            }
-            
-            // Smooth scroll to target
-            window.scrollTo({
-                top: targetElement.offsetTop - 80,
-                behavior: 'smooth'
-            });
         });
     });
     
-    // Mobile menu toggle
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', function() {
+    // 移动端菜单切换
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
             mobileMenu.classList.toggle('hidden');
             
-            // Update aria-expanded attribute for accessibility
-            const isExpanded = !mobileMenu.classList.contains('hidden');
-            mobileMenuButton.setAttribute('aria-expanded', isExpanded);
-            
-            // Animate hamburger icon
-            const bars = mobileMenuButton.querySelectorAll('svg path');
-            if (isExpanded) {
-                bars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
-                bars[1].style.opacity = '0';
-                bars[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
-            } else {
-                bars[0].style.transform = 'none';
-                bars[1].style.opacity = '1';
-                bars[2].style.transform = 'none';
+            // 切换图标
+            const icon = this.querySelector('svg');
+            if (icon) {
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                } else {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                }
             }
         });
         
-        // Close mobile menu when clicking outside
+        // 点击菜单外区域关闭菜单
         document.addEventListener('click', function(e) {
-            if (!mobileMenu.classList.contains('hidden') &&
-                !mobileMenu.contains(e.target) &&
-                !mobileMenuButton.contains(e.target)) {
+            if (!mobileMenu.classList.contains('hidden') && 
+                !mobileMenu.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target)) {
                 mobileMenu.classList.add('hidden');
-                mobileMenuButton.setAttribute('aria-expanded', 'false');
-                
-                // Reset hamburger icon
-                const bars = mobileMenuButton.querySelectorAll('svg path');
-                bars[0].style.transform = 'none';
-                bars[1].style.opacity = '1';
-                bars[2].style.transform = 'none';
+                const icon = mobileMenuBtn.querySelector('svg');
+                if (icon) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
             }
         });
     }
-    
-    // Highlight active section in navigation
-    function updateActiveNavLink() {
-        const sections = document.querySelectorAll('section[id]');
-        const scrollPosition = window.scrollY + 100;
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            const sectionId = section.getAttribute('id');
-            
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                navLinks.forEach(link => {
-                    link.classList.remove('text-blue-400', 'border-blue-400');
-                    link.classList.add('text-gray-300', 'hover:text-white');
-                    
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.remove('text-gray-300', 'hover:text-white');
-                        link.classList.add('text-blue-400', 'border-blue-400');
-                    }
-                });
-            }
-        });
-    }
-    
-    window.addEventListener('scroll', updateActiveNavLink);
-    updateActiveNavLink(); // Initial call
 }
 
 /**
- * Hero Animations Module
- * Handles animations and effects in the hero section
+ * 初始化技能图标墙自动滚动
  */
-function initHeroAnimations() {
-    const heroTitle = document.querySelector('.hero-title');
-    const heroSubtitle = document.querySelector('.hero-subtitle');
-    const heroButtons = document.querySelectorAll('.hero-buttons a');
-    
-    if (!heroTitle) {
-        console.warn('Hero title element not found');
+function initSkillWall() {
+    const skillWall = document.getElementById('skill-wall');
+    if (!skillWall) {
+        console.warn('技能图标墙元素未找到');
         return;
     }
     
-    // Split text for character animation
-    function splitTextForAnimation(element) {
-        const text = element.textContent;
-        element.innerHTML = '';
-        
-        text.split('').forEach((char, index) => {
-            const span = document.createElement('span');
-            span.textContent = char === ' ' ? '\u00A0' : char;
-            span.style.display = 'inline-block';
-            span.style.opacity = '0';
-            span.style.transform = 'translateY(20px)';
-            span.style.transition = `opacity 0.5s ease ${index * 0.05}s, transform 0.5s ease ${index * 0.05}s`;
-            element.appendChild(span);
-        });
+    // 克隆技能项以实现无缝滚动
+    const skillItems = skillWall.querySelectorAll('.skill-item');
+    if (skillItems.length === 0) {
+        console.warn('未找到技能项');
+        return;
     }
     
-    // Apply text splitting to hero elements
-    if (heroTitle) splitTextForAnimation(heroTitle);
-    if (heroSubtitle) splitTextForAnimation(heroSubtitle);
+    // 创建克隆节点
+    skillItems.forEach(item => {
+        const clone = item.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        skillWall.appendChild(clone);
+    });
     
-    // Animate hero elements on load
-    setTimeout(() => {
-        // Animate title characters
-        const titleChars = heroTitle.querySelectorAll('span');
-        titleChars.forEach(char => {
-            char.style.opacity = '1';
-            char.style.transform = 'translateY(0)';
-        });
-        
-        // Animate subtitle characters with delay
-        setTimeout(() => {
-            if (heroSubtitle) {
-                const subtitleChars = heroSubtitle.querySelectorAll('span');
-                subtitleChars.forEach(char => {
-                    char.style.opacity = '1';
-                    char.style.transform = 'translateY(0)';
-                });
-            }
-        }, 500);
-        
-        // Animate buttons with delay
-        setTimeout(() => {
-            heroButtons.forEach((button, index) => {
-                button.style.opacity = '0';
-                button.style.transform = 'translateY(20px)';
-                button.style.transition = `opacity 0.5s ease ${index * 0.2}s, transform 0.5s ease ${index * 0.2}s`;
-                
-                setTimeout(() => {
-                    button.style.opacity = '1';
-                    button.style.transform = 'translateY(0)';
-                }, 100);
-            });
-        }, 1000);
-    }, 300);
+    // 设置动画
+    skillWall.style.animation = 'scrollSkills 30s linear infinite';
     
-    // Add floating animation to hero section
-    function addFloatingAnimation() {
-        const heroSection = document.querySelector('#hero');
-        if (!heroSection) return;
-        
-        let mouseX = 0;
-        let mouseY = 0;
-        let floatingElements = [];
-        
-        // Create floating elements
-        for (let i = 0; i < 15; i++) {
-            const element = document.createElement('div');
-            element.className = 'floating-element';
-            element.style.position = 'absolute';
-            element.style.width = `${Math.random() * 4 + 1}px`;
-            element.style.height = element.style.width;
-            element.style.background = 'rgba(59, 130, 246, 0.3)';
-            element.style.borderRadius = '50%';
-            element.style.top = `${Math.random() * 100}%`;
-            element.style.left = `${Math.random() * 100}%`;
-            element.style.zIndex = '-1';
-            element.style.pointerEvents = 'none';
-            
-            heroSection.appendChild(element);
-            floatingElements.push({
-                element,
-                speed: Math.random() * 0.5 + 0.2,
-                x: parseFloat(element.style.left),
-                y: parseFloat(element.style.top)
-            });
+    // 鼠标悬停时暂停动画
+    skillWall.addEventListener('mouseenter', function() {
+        this.style.animationPlayState = 'paused';
+    });
+    
+    skillWall.addEventListener('mouseleave', function() {
+        this.style.animationPlayState = 'running';
+    });
+    
+    // 触摸设备支持
+    let isTouching = false;
+    skillWall.addEventListener('touchstart', function() {
+        this.style.animationPlayState = 'paused';
+        isTouching = true;
+    });
+    
+    skillWall.addEventListener('touchend', function() {
+        if (isTouching) {
+            setTimeout(() => {
+                this.style.animationPlayState = 'running';
+                isTouching = false;
+            }, 1000);
         }
-        
-        // Mouse move effect
-        heroSection.addEventListener('mousemove', (e) => {
-            const rect = heroSection.getBoundingClientRect();
-            mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-            mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-        });
-        
-        // Animation loop
-        function animateFloatingElements() {
-            floatingElements.forEach(item => {
-                // Update position based on mouse movement
-                item.x += mouseX * 0.01;
-                item.y += mouseY * 0.01;
-                
-                // Add natural floating movement
-                item.x += Math.sin(Date.now() * 0.001 * item.speed) * 0.1;
-                item.y += Math.cos(Date.now() * 0.001 * item.speed) * 0.1;
-                
-                // Keep within bounds
-                item.x = (item.x + 100) % 100;
-                item.y = (item.y + 100) % 100;
-                
-                // Apply position
-                item.element.style.left = `${item.x}%`;
-                item.element.style.top = `${item.y}%`;
-            });
-            
-            requestAnimationFrame(animateFloatingElements);
-        }
-        
-        animateFloatingElements();
-    }
-    
-    // Start floating animation
-    setTimeout(addFloatingAnimation, 2000);
+    });
 }
 
 /**
- * Project Cards Module
- * Handles 3D hover effects and interactions for project cards
+ * 初始化项目卡片交互
  */
 function initProjectCards() {
     const projectCards = document.querySelectorAll('.project-card');
     
-    if (projectCards.length === 0) {
-        console.warn('No project cards found');
-        return;
-    }
-    
     projectCards.forEach(card => {
-        // Store original transform for reset
-        card.dataset.originalTransform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        
-        // Add 3D transform style
-        card.style.transformStyle = 'preserve-3d';
-        card.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
-        
-        // Mouse move effect
+        // 鼠标移动时的3D效果
         card.addEventListener('mousemove', function(e) {
-            if (window.innerWidth < 768) return; // Disable on mobile
-            
             const rect = this.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -328,193 +169,373 @@ function initProjectCards() {
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateY = ((x - centerX) / centerX) * 10; // Max 10 degrees
-            const rotateX = ((centerY - y) / centerY) * 10; // Max 10 degrees
+            const rotateY = (x - centerX) / 25;
+            const rotateX = (centerY - y) / 25;
             
-            // Apply 3D transform
             this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            
-            // Add shadow based on mouse position
-            const shadowX = (x - centerX) / 10;
-            const shadowY = (y - centerY) / 10;
-            const shadowBlur = 30;
-            const shadowColor = 'rgba(59, 130, 246, 0.3)';
-            
-            this.style.boxShadow = `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor}`;
         });
         
-        // Mouse leave effect
+        // 鼠标离开时重置
         card.addEventListener('mouseleave', function() {
-            this.style.transform = this.dataset.originalTransform;
-            this.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
+            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            this.style.transition = 'transform 0.5s ease';
         });
         
-        // Touch events for mobile
+        // 触摸设备支持
         card.addEventListener('touchstart', function() {
-            if (window.innerWidth >= 768) return;
-            this.style.transform = 'scale(0.98)';
+            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1.05, 1.05, 1.05)';
         });
         
         card.addEventListener('touchend', function() {
-            if (window.innerWidth >= 768) return;
-            this.style.transform = 'scale(1)';
+            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
         });
         
-        // Click effect
-        card.addEventListener('click', function(e) {
-            // Prevent navigation if clicking on links inside card
-            if (e.target.tagName === 'A' || e.target.closest('a')) {
-                return;
-            }
+        // 点击项目链接
+        const projectLink = card.querySelector('a[href^="#"]');
+        if (projectLink) {
+            projectLink.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
+}
+
+/**
+ * 初始化联系表单处理
+ */
+function initContactForm() {
+    const contactForm = document.getElementById('contact-form');
+    if (!contactForm) {
+        console.warn('联系表单元素未找到');
+        return;
+    }
+    
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : '发送消息';
+    
+    // 表单提交处理
+    contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        // 禁用提交按钮并显示加载状态
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                发送中...
+            `;
+        }
+        
+        try {
+            // 模拟API调用
+            await simulateFormSubmission();
             
-            // Add click animation
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = this.dataset.originalTransform;
-            }, 150);
+            // 显示成功消息
+            showFormMessage('消息发送成功！我会尽快回复您。', 'success');
             
-            // Find and click the view project link
-            const projectLink = this.querySelector('a[href*="project"]');
-            if (projectLink) {
-                projectLink.click();
+            // 重置表单
+            contactForm.reset();
+            
+        } catch (error) {
+            console.error('表单提交失败:', error);
+            showFormMessage('发送失败，请稍后重试或直接通过邮箱联系。', 'error');
+            
+        } finally {
+            // 恢复提交按钮
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
-        });
-        
-        // Keyboard navigation
-        card.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.click();
-            }
-        });
-        
-        // Set tabindex for accessibility
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', `View ${this.querySelector('h3')?.textContent || 'project'} details`);
+        }
     });
     
-    // Lazy load project images
-    const projectImages = document.querySelectorAll('.project-image');
+    /**
+     * 表单验证
+     */
+    function validateForm() {
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const message = document.getElementById('message');
+        
+        let isValid = true;
+        
+        // 清除之前的错误状态
+        clearFormErrors();
+        
+        // 验证姓名
+        if (!name.value.trim()) {
+            showFieldError(name, '请输入您的姓名');
+            isValid = false;
+        }
+        
+        // 验证邮箱
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim()) {
+            showFieldError(email, '请输入您的邮箱');
+            isValid = false;
+        } else if (!emailRegex.test(email.value)) {
+            showFieldError(email, '请输入有效的邮箱地址');
+            isValid = false;
+        }
+        
+        // 验证消息
+        if (!message.value.trim()) {
+            showFieldError(message, '请输入您的消息');
+            isValid = false;
+        } else if (message.value.trim().length < 10) {
+            showFieldError(message, '消息内容至少需要10个字符');
+            isValid = false;
+        }
+        
+        return isValid;
+    }
     
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    const src = img.dataset.src;
-                    
-                    if (src) {
-                        img.src = src;
-                        img.classList.add('loaded');
-                        observer.unobserve(img);
-                    }
-                }
-            });
-        }, {
-            rootMargin: '50px 0px',
-            threshold: 0.1
+    /**
+     * 显示字段错误
+     */
+    function showFieldError(field, message) {
+        field.classList.add('border-red-500');
+        field.classList.remove('border-slate-700');
+        
+        // 创建错误消息元素
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'text-red-400 text-sm mt-1';
+        errorDiv.textContent = message;
+        
+        // 插入到字段后面
+        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
+    
+    /**
+     * 清除表单错误状态
+     */
+    function clearFormErrors() {
+        // 清除字段错误样式
+        const fields = contactForm.querySelectorAll('input, textarea');
+        fields.forEach(field => {
+            field.classList.remove('border-red-500');
+            field.classList.add('border-slate-700');
         });
         
-        projectImages.forEach(img => {
-            if (img.dataset.src) {
-                imageObserver.observe(img);
+        // 移除错误消息
+        const errorMessages = contactForm.querySelectorAll('.text-red-400');
+        errorMessages.forEach(msg => msg.remove());
+    }
+    
+    /**
+     * 显示表单消息
+     */
+    function showFormMessage(message, type) {
+        // 移除之前的消息
+        const existingMessage = document.getElementById('form-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        // 创建消息元素
+        const messageDiv = document.createElement('div');
+        messageDiv.id = 'form-message';
+        messageDiv.className = `mt-4 p-4 rounded-lg ${
+            type === 'success' 
+                ? 'bg-green-900/30 text-green-400 border border-green-800' 
+                : 'bg-red-900/30 text-red-400 border border-red-800'
+        }`;
+        messageDiv.textContent = message;
+        
+        // 插入到表单前面
+        contactForm.parentNode.insertBefore(messageDiv, contactForm);
+        
+        // 5秒后自动移除
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+    
+    /**
+     * 模拟表单提交
+     */
+    function simulateFormSubmission() {
+        return new Promise((resolve, reject) => {
+            // 模拟网络延迟
+            setTimeout(() => {
+                // 90%的成功率
+                if (Math.random() > 0.1) {
+                    resolve();
+                } else {
+                    reject(new Error('模拟网络错误'));
+                }
+            }, 1500);
+        });
+    }
+}
+
+/**
+ * 初始化滚动动画
+ */
+function initScrollAnimations() {
+    // 使用Intersection Observer API实现滚动动画
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
             }
         });
-    } else {
-        // Fallback for older browsers
-        projectImages.forEach(img => {
-            if (img.dataset.src) {
-                img.src = img.dataset.src;
+    }, observerOptions);
+    
+    // 观察需要动画的元素
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(el => observer.observe(el));
+    
+    // 节流滚动事件
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateActiveNavLink();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+    
+    /**
+     * 更新活动导航链接
+     */
+    function updateActiveNavLink() {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+        
+        let currentSection = '';
+        const scrollPosition = window.scrollY + 100;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('text-blue-400', 'border-blue-400');
+            link.classList.add('text-slate-300', 'border-transparent');
+            
+            if (link.getAttribute('href') === `#${currentSection}`) {
+                link.classList.remove('text-slate-300', 'border-transparent');
+                link.classList.add('text-blue-400', 'border-blue-400');
             }
         });
     }
 }
 
 /**
- * Tech Stack Carousel Module
- * Handles the auto-scrolling tech stack icons wall
+ * 初始化主题切换
  */
-function initTechStackCarousel() {
-    const techStackContainer = document.querySelector('.tech-stack-container');
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
     
-    if (!techStackContainer) {
-        console.warn('Tech stack container not found');
-        return;
+    // 检查本地存储的主题偏好
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // 设置初始主题
+    if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcon('light');
+    } else {
+        document.documentElement.classList.add('dark');
+        updateThemeIcon('dark');
     }
     
-    // Clone items for seamless scrolling
-    const items = techStackContainer.innerHTML;
-    techStackContainer.innerHTML += items;
-    
-    // Set up animation
-    let animationId;
-    let scrollPosition = 0;
-    const scrollSpeed = 0.5; // pixels per frame
-    
-    function animateCarousel() {
-        scrollPosition -= scrollSpeed;
+    // 切换主题
+    themeToggle.addEventListener('click', function() {
+        const isDark = document.documentElement.classList.contains('dark');
         
-        // Reset position when scrolled halfway
-        const containerWidth = techStackContainer.scrollWidth / 2;
-        if (Math.abs(scrollPosition) >= containerWidth) {
-            scrollPosition = 0;
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            updateThemeIcon('light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeIcon('dark');
         }
+    });
+    
+    /**
+     * 更新主题图标
+     */
+    function updateThemeIcon(theme) {
+        const icon = themeToggle.querySelector('svg');
+        if (!icon) return;
         
-        techStackContainer.style.transform = `translateX(${scrollPosition}px)`;
-        animationId = requestAnimationFrame(animateCarousel);
+        if (theme === 'light') {
+            icon.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            `;
+        } else {
+            icon.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            `;
+        }
     }
-    
-    // Start animation
-    animateCarousel();
-    
-    // Pause animation on hover
-    techStackContainer.addEventListener('mouseenter', () => {
-        cancelAnimationFrame(animationId);
-        techStackContainer.style.transition = 'transform 0.3s ease';
-        techStackContainer.style.transform = `translateX(${scrollPosition}px)`;
-    });
-    
-    techStackContainer.addEventListener('mouseleave', () => {
-        techStackContainer.style.transition = 'none';
-        animateCarousel();
-    });
-    
-    // Touch support for mobile
-    let touchStartX = 0;
-    let isDragging = false;
-    
-    techStackContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-        isDragging = true;
-        cancelAnimationFrame(animationId);
-    });
-    
-    techStackContainer.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        
-        const touchX = e.touches[0].clientX;
-        const deltaX = touchX - touchStartX;
-        
-        scrollPosition += deltaX * 0.5;
-        techStackContainer.style.transform = `translateX(${scrollPosition}px)`;
-        touchStartX = touchX;
-    });
-    
-    techStackContainer.addEventListener('touchend', () => {
-        isDragging = false;
-        animateCarousel();
-    });
-    
-    // Add click/tap effect to icons
-    const techIcons = document.querySelectorAll('.tech-icon');
-    techIcons.forEach(icon => {
-        icon.addEventListener('click', function() {
-            this.style.transform = 'scale(0.9)';
-            this.style.transition = 'transform 0.2s ease';
-            
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 200);
-            
-            // Get tech name for potential analytics or
+}
+
+/**
+ * 工具函数：防抖
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * 工具函数：节流
+ */
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// 导出函数供全局使用（如果需要）
+window.PersonalWebsite = {
+    initNavigation,
+    initSkillWall,
+    initProjectCards,
+    initContactForm,
+    initScrollAnimations,
+    initThemeToggle
+};
