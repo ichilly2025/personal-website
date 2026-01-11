@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Chen | Senior Full-Stack Engineer</title>
+    <meta name="description" content="Portfolio website of Alex Chen, a senior full-stack engineer specializing in modern web technologies and scalable applications.">
+    <meta name="keywords" content="full-stack, engineer, developer, web, JavaScript, React, Node.js, portfolio">
+    <meta name="author" content="Alex Chen">
+
+    <!-- Favicon and PWA Manifest -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="./site.webmanifest">
+    <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Configuration for custom colors and animations -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'dark-bg': '#0f172a',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'scroll': 'scroll 40s linear infinite',
+                        'fade-in': 'fadeIn 1s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        scroll: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    backdropBlur: {
+                        'glass': '12px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./app.css">
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Optional: Google Fonts for enhanced typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Inline critical font-face to prevent layout shift */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-100 min-h-screen overflow-x-hidden font-sans antialiased">
+
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white p-3 rounded-lg z-50">Skip to main content</a>
+
+    <!-- Fixed Navigation Bar with Glassmorphism Effect -->
+    <header class="fixed top-0 left-0 w-full z-40 py-4 transition-all duration-300" id="navbar">
+        <nav class="container mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center backdrop-blur-glass bg-dark-bg/70 border border-slate-700/30 rounded-2xl px-6 py-3 shadow-2xl">
+                <!-- Logo / Name -->
+                <a href="#" class="text-xl font-bold tracking-tight text-white hover:text-primary transition-colors duration-300">
+                    ALEX CHEN
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <ul class="hidden md:flex space-x-8">
+                    <li><a href="#home" class="nav-link" data-section="home">Home</a></li>
+                    <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
+                    <li><a href="#tech" class="nav-link" data-section="tech">Tech Stack</a></li>
+                    <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+                </ul>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg hover:bg-slate-800/50 transition-colors" aria-label="Toggle navigation menu">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Theme Toggle (Placeholder for future dark/light mode) -->
+                <button id="theme-toggle" class="hidden p-2 rounded-lg hover:bg-slate-800/50 transition-colors" aria-label="Toggle theme">
+                    <i data-lucide="sun" class="w-5 h-5 hidden" id="sun-icon"></i>
+                    <i data-lucide="moon" class="w-5 h-5" id="moon-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu (Hidden by default) -->
+            <div id="mobile-menu" class="md:hidden absolute top-full left-0 w-full mt-2 px-6 opacity-0 translate-y-2 pointer-events-none transition-all duration-300">
+                <div class="backdrop-blur-glass bg-dark-bg/90 border border-slate-700/30 rounded-2xl p-6 shadow-2xl">
+                    <ul class="flex flex-col space-y-4">
+                        <li><a href="#home" class="mobile-nav-link block py-3 text-lg" data-section="home">Home</a></li>
+                        <li><a href="#projects" class="mobile-nav-link block py-3 text-lg" data-section="projects">Projects</a></li>
+                        <li><a href="#tech" class="mobile-nav-link block py-3 text-lg" data-section="tech">Tech Stack</a></li>
+                        <li><a href="#contact" class="mobile-nav-link block py-3 text-lg" data-section="contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+            <!-- Animated Background Elements -->
+            <div class="absolute inset-0 z-0">
+                <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+            </div>
+
+            <div class="container mx-auto px-6 lg:px-12 text-center relative z-10">
+                <!-- Avatar / Profile Image -->
+                <div class="mb-10 animate-float">
+                    <div class="relative w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-slate-700/50 shadow-2xl">
+                        <img src="./assets/images/avatar.jpg" alt="Portrait of Alex Chen" class="w-full h-full object-cover" id="avatar-img" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'; this.alt='Default avatar placeholder';">
+                    </div>
+                </div>
+
+                <!-- Hero Title and Subtitle -->
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+                    <span class="block opacity-0 animate-fade-in" style="animation-delay: 0.2s;">Building the</span>
+                    <span class="block text-primary opacity-0 animate-fade-in" style="animation-delay: 0.5s;">Digital Future</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto opacity-0 animate-fade-in-up" style="animation-delay: 0.8s;">
+                    Senior Full-Stack Engineer crafting high-performance, scalable applications with modern technologies and clean architecture.
+                </p>
+
+                <!-- Call to Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center opacity-0 animate-fade-in-up" style="animation-delay: 1s;">
+                    <a href="#projects" class="btn-primary">
+                        <i data-lucide="sparkles" class="w-5 h-5 mr-2"></i> View My Work
+                    </a>
+                    <a href="#contact" class="btn-secondary">
+                        <i data-lucide="mail" class="w-5 h-5 mr-2"></i> Get In Touch
+                    </a>
+                </div>
+
+                <!-- Scroll Indicator -->
+                <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <a href="#projects" aria-label="Scroll to projects section">
+                        <i data-lucide="chevron-down" class="w-8 h-8 text-slate-400"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-24 relative">
+            <div class="container mx-auto px-6 lg:px-12">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Featured <span class="text-primary">Projects</span></h2>
+                    <p class="text-xl text-slate-300 max-w-2xl mx-auto">A selection of recent work showcasing full-stack expertise, from concept to deployment.</p>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project Card 1 -->
+                    <article class="project-card group">
+                        <div class="project-card-inner">
+                            <div class="project-image-container">
+                                <img src="./assets/images/project1.jpg" alt="Dashboard interface of Enterprise Analytics Platform" class="project-image" onerror="this.src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; this.alt='Project 1 placeholder';">
+                                <div class="project-overlay">
+                                    <a href="#" class="project-link" aria-label="Live demo of Enterprise Analytics Platform">
+                                        <i data-lucide="external-link" class="w-6 h-6"></i>
+                                    </a>
+                                    <a href="#" class="project-link" aria-label="GitHub repository of Enterprise Analytics Platform">
+                                        <i data-lucide="github" class="w-6 h-6"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">Enterprise Analytics Platform</h3>
+                                <p class="text-slate-300 mb-4">Real-time data visualization and business intelligence dashboard built with React, D3.js, and Node.js microservices.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="tech-tag">React</span>
+                                    <span class="tech-tag">TypeScript</span>
+                                    <span class="tech-tag">Node.js</span>
+                                    <span class="tech-tag">PostgreSQL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 2 -->
+                    <article class="project-card group">
+                        <div class="project-card-inner">
+                            <div class="project-image-container">
+                                <img src="./assets/images/project2.jpg" alt="Mobile app interface for FinTech App" class="project-image" onerror="this.src='https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; this.alt='Project 2 placeholder';">
+                                <div class="project-overlay">
+                                    <a href="#" class="project-link" aria-label="Live demo of FinTech Mobile App">
+                                        <i data-lucide="external-link" class="w-6 h-6"></i>
+                                    </a>
+                                    <a href="#" class="project-link" aria-label="GitHub repository of FinTech Mobile App">
+                                        <i data-lucide="github" class="w-6 h-6"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">FinTech Mobile App</h3>
+                                <p class="text-slate-300 mb-4">Secure personal finance management application with biometric authentication and blockchain integration.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="tech-tag">React Native</span>
+                                    <span class="tech-tag">GraphQL</span>
+                                    <span class="tech-tag">AWS</span>
+                                    <span class="tech-tag">Solidity</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 3 -->
+                    <article class="project-card group">
+                        <div class="project-card-inner">
+                            <div class="project-image-container">
+                                <img src="./assets/images/project3.jpg" alt="E-commerce platform interface" class="project-image" onerror="this.src='https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; this.alt='Project 3 placeholder';">
+                                <div class="project-overlay">
+                                    <a href="#" class="project-link" aria-label="Live demo of E-commerce Platform">
+                                        <i data-lucide="external-link" class="w-6 h-6"></i>
+                                    </a>
+                                    <a href="#" class="project-link" aria-label="GitHub repository of E-commerce Platform">
+                                        <i data-lucide="github" class="w-6 h-6"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">Scalable E-commerce Platform</h3>
+                                <p class="text-slate-300 mb-4">High-traffic online marketplace with real-time inventory, payment processing, and recommendation engine.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="tech-tag">Next.js</span>
+                                    <span class="tech-tag">MongoDB</span>
+                                    <span class="tech-tag">Redis</span>
+                                    <span class="tech-tag">Docker</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- View More Projects Link -->
+                <div class="text-center mt-12">
+                    <a href="#" class="inline-flex items-center text-primary hover:text-blue-400 text-lg font-medium transition-colors group">
+                        View All Projects
+                        <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Section -->
+        <section id="tech" class="py-24 bg-slate-900/30 relative overflow-hidden">
+            <div class="container mx-auto px-6 lg:px-12">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Tech <span class="text-primary">Stack</span></h2>
+                    <p class="text-xl text-slate-300 max-w-2xl mx-auto">Technologies and tools I use to bring ideas to life across the entire development stack.</p>
+                </div>
+
+                <!-- Scrolling Tech Icons Container -->
+                <div class="relative">
+                    <!-- Gradient Fade Edges -->
+                    <div class="absolute left-0 top-0 bottom-0 w-24 bg
